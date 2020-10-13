@@ -1,5 +1,4 @@
-//! examples/local.rs
-
+//! examples/task-local-cfg.rs
 #![deny(unsafe_code)]
 #![deny(warnings)]
 #![no_main]
@@ -71,7 +70,9 @@ mod app {
         #[cfg(feature = "feature_e2")]
         hprintln!("IDLE:e2 = {}", _cx.resources.e2).unwrap();
         debug::exit(debug::EXIT_SUCCESS);
-        loop {}
+        loop {
+            cortex_m::asm::nop();
+        }
     }
 
     // `shared` can be accessed from this context

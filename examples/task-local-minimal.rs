@@ -1,4 +1,4 @@
-//! examples/local_minimal.rs
+//! examples/task-local_minimal.rs
 #![deny(unsafe_code)]
 #![deny(warnings)]
 #![no_main]
@@ -26,6 +26,8 @@ mod app {
     fn idle(cx: idle::Context) -> ! {
         hprintln!("IDLE:l = {}", cx.resources.l).unwrap();
         debug::exit(debug::EXIT_SUCCESS);
-        loop {}
+        loop {
+            cortex_m::asm::nop();
+        }
     }
 }

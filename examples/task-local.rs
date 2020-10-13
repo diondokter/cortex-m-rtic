@@ -1,4 +1,4 @@
-//! examples/local.rs
+//! examples/task-local.rs
 
 #![deny(unsafe_code)]
 #![deny(warnings)]
@@ -51,7 +51,9 @@ mod app {
         hprintln!("IDLE:l1 = {}", cx.resources.l1).unwrap();
         hprintln!("IDLE:e2 = {}", cx.resources.e2).unwrap();
         debug::exit(debug::EXIT_SUCCESS);
-        loop {}
+        loop {
+            cortex_m::asm::nop();
+        }
     }
 
     // `shared` can be accessed from this context
