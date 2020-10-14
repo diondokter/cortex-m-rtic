@@ -126,6 +126,19 @@ pub fn app(app: &App, analysis: &Analysis, extra: &Extra) -> TokenStream2 {
     let user_code = app.user_code.clone();
     let name = &app.name;
     let device = extra.device;
+
+    // Get the list of all tasks
+    let task_list = analysis.tasks.clone();
+
+    let mut tasks = vec![];
+    if !task_list.is_empty() {
+        tasks.push(quote!(
+            enum Tasks {
+                #(#task_list),*
+            }
+        ));
+    }
+
     quote!(
         #(#user)*
 
@@ -140,6 +153,8 @@ pub fn app(app: &App, analysis: &Analysis, extra: &Extra) -> TokenStream2 {
         #(#root_hardware_tasks)*
 
         #(#root_software_tasks)*
+
+        #(#tasks)*
 
         /// Implementation details
         mod #name {
