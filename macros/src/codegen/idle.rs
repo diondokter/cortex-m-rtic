@@ -1,5 +1,5 @@
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{format_ident, quote};
+use quote::quote;
 use rtic_syntax::{ast::App, Context};
 
 use crate::{
@@ -36,7 +36,7 @@ pub fn codegen(
         let mut locals_pat = None;
         let mut locals_new = None;
 
-        let mut user_idle_imports = vec![];
+        let user_idle_imports = vec![];
 
         let name = &idle.name;
 
@@ -46,12 +46,6 @@ pub fn codegen(
 
             root_idle.push(item);
             mod_app = Some(constructor);
-
-            let name_resource = format_ident!("{}Resources", name);
-            user_idle_imports.push(quote!(
-                    #[allow(non_snake_case)]
-                    use super::#name_resource;
-            ));
         }
 
         if !idle.locals.is_empty() {
@@ -83,14 +77,9 @@ pub fn codegen(
                 #(#stmts)*
             }
         ));
-        user_idle_imports.push(quote!(
-            #(#attrs)*
-            #[allow(non_snake_case)]
-            use super::#name;
-        ));
 
         let locals_new = locals_new.iter();
-        let call_idle = quote!(crate::#name(
+        let call_idle = quote!(#name(
             #(#locals_new,)*
             #name::Context::new(&rtic::export::Priority::new(0))
         ));

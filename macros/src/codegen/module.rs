@@ -198,8 +198,8 @@ pub fn codegen(
         let rq = util::rq_ident(priority);
         let inputs = util::inputs_ident(name);
 
-        let app_name = &app.name;
-        let app_path = quote! {crate::#app_name};
+        //let app_name = &app.name;
+        let app_path = quote! { super };
 
         let device = extra.device;
         let enum_ = util::interrupt_ident();

@@ -98,7 +98,7 @@ pub fn codegen(app: &App, analysis: &Analysis, extra: &Extra) -> Vec<TokenStream
                         #let_instant
                         #fq.split().0.enqueue_unchecked(index);
                         let priority = &rtic::export::Priority::new(PRIORITY);
-                        crate::#name(
+                        #name(
                             #locals_new
                             #name::Context::new(priority #instant)
                             #(,#pats)*

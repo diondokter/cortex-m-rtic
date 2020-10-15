@@ -1,5 +1,5 @@
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{format_ident, quote};
+use quote::quote;
 use rtic_syntax::{ast::App, Context};
 
 use crate::{
@@ -29,7 +29,7 @@ pub fn codegen(
     let mut mod_app = vec![];
     let mut root = vec![];
     let mut user_tasks = vec![];
-    let mut hardware_tasks_imports = vec![];
+    let hardware_tasks_imports = vec![];
 
     for (name, task) in &app.hardware_tasks {
         let (let_instant, instant) = if let Some(m) = extra.monotonic {
@@ -59,7 +59,7 @@ pub fn codegen(
                 #let_instant
 
                 rtic::export::run(PRIORITY, || {
-                    crate::#name(
+                    #name(
                         #locals_new
                         #name::Context::new(&rtic::export::Priority::new(PRIORITY) #instant)
                     )
@@ -78,13 +78,6 @@ pub fn codegen(
                 app,
                 analysis,
             );
-
-            // Add resources to imports
-            let name_res = format_ident!("{}Resources", name);
-            hardware_tasks_imports.push(quote!(
-                #[allow(non_snake_case)]
-                use super::#name_res;
-            ));
 
             root.push(item);
 
@@ -120,12 +113,6 @@ pub fn codegen(
 
                 #(#stmts)*
             }
-        ));
-
-        hardware_tasks_imports.push(quote!(
-            #(#attrs)*
-            #[allow(non_snake_case)]
-            use super::#name;
         ));
     }
 

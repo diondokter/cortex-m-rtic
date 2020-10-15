@@ -22,7 +22,6 @@ mod util;
 // TODO document the syntax here or in `rtic-syntax`
 pub fn app(app: &App, analysis: &Analysis, extra: &Extra) -> TokenStream2 {
     let mut mod_app = vec![];
-    let mut mod_app_imports = vec![];
     let mut mains = vec![];
     let mut root = vec![];
     let mut user = vec![];
@@ -40,17 +39,6 @@ pub fn app(app: &App, analysis: &Analysis, extra: &Extra) -> TokenStream2 {
 
     let (mod_app_idle, root_idle, user_idle, user_idle_imports, call_idle) =
         idle::codegen(app, analysis, extra);
-
-    if user_init.is_some() {
-        mod_app_imports.push(quote!(
-            use super::init;
-        ))
-    }
-    if user_idle.is_some() {
-        mod_app_imports.push(quote!(
-            use super::idle;
-        ))
-    }
 
     user.push(quote!(
         #user_init
@@ -107,7 +95,6 @@ pub fn app(app: &App, analysis: &Analysis, extra: &Extra) -> TokenStream2 {
         mod_app_software_tasks,
         root_software_tasks,
         user_software_tasks,
-        user_software_tasks_imports,
     ) = software_tasks::codegen(app, analysis, extra);
 
     let mod_app_dispatchers = dispatchers::codegen(app, analysis, extra);
@@ -118,24 +105,25 @@ pub fn app(app: &App, analysis: &Analysis, extra: &Extra) -> TokenStream2 {
     let device = extra.device;
 
     quote!(
-        #(#user)*
-
-        #(#user_hardware_tasks)*
-
-        #(#user_software_tasks)*
-
-        #(#root)*
-
-        #mod_resources
-
-        #(#root_hardware_tasks)*
-
-        #(#root_software_tasks)*
 
         /// Implementation details
         mod #name {
             /// Always include the device crate which contains the vector table
             use #device as _;
+            #(#user)*
+
+            #(#user_hardware_tasks)*
+
+            #(#user_software_tasks)*
+
+            #(#root)*
+
+            #mod_resources
+
+            #(#root_hardware_tasks)*
+
+            #(#root_software_tasks)*
+
             #(#imports)*
             #(#user_imports)*
 
@@ -145,8 +133,6 @@ pub fn app(app: &App, analysis: &Analysis, extra: &Extra) -> TokenStream2 {
 
 
             #(#user_hardware_tasks_imports)*
-
-            #(#user_software_tasks_imports)*
 
             #(#mod_resources_imports)*
 

@@ -1,5 +1,5 @@
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{format_ident, quote};
+use quote::quote;
 use rtic_syntax::{ast::App, Context};
 
 use crate::{
@@ -52,7 +52,7 @@ pub fn codegen(
             })
             .collect::<Vec<_>>();
 
-        let mut user_init_imports = vec![];
+        let user_init_imports = vec![];
         let late_resources = util::late_resources_ident(&name);
 
         root_init.push(quote!(
@@ -61,12 +61,6 @@ pub fn codegen(
             pub struct #late_resources {
                 #(#late_fields),*
             }
-        ));
-
-        let name_late = format_ident!("{}LateResources", name);
-        user_init_imports.push(quote!(
-                #[allow(non_snake_case)]
-                use super::#name_late;
         ));
 
         let mut locals_pat = None;
@@ -90,11 +84,6 @@ pub fn codegen(
                 #(#stmts)*
             }
         ));
-        user_init_imports.push(quote!(
-                #(#attrs)*
-                #[allow(non_snake_case)]
-                use super::#name;
-        ));
 
         let mut mod_app = None;
         if !init.args.resources.is_empty() {
@@ -103,17 +92,11 @@ pub fn codegen(
 
             root_init.push(item);
             mod_app = Some(constructor);
-
-            let name_late = format_ident!("{}Resources", name);
-            user_init_imports.push(quote!(
-                    #[allow(non_snake_case)]
-                    use super::#name_late;
-            ));
         }
 
         let locals_new = locals_new.iter();
         let call_init = Some(
-            quote!(let late = crate::#name(#(#locals_new,)* #name::Context::new(core.into()));),
+            quote!(let late = #name(#(#locals_new,)* #name::Context::new(core.into()));),
         );
 
         root_init.push(module::codegen(
