@@ -128,6 +128,7 @@ pub fn app(app: &App, analysis: &Analysis, extra: &Extra) -> TokenStream2 {
     let device = extra.device;
 
     // Get the list of all tasks
+    // Currently unused, might be useful
     let task_list = analysis.tasks.clone();
 
     let mut tasks = vec![];
@@ -154,6 +155,7 @@ pub fn app(app: &App, analysis: &Analysis, extra: &Extra) -> TokenStream2 {
 
         #(#root_software_tasks)*
 
+        /// Unused
         #(#tasks)*
 
         /// Implementation details
